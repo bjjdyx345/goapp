@@ -22,6 +22,7 @@ export function requestDetail(id) {
     params: { id }
   })
 }
+
 export function requestUpdate(data) {
   return request({
     url: '/menu/update',
@@ -29,6 +30,7 @@ export function requestUpdate(data) {
     data
   })
 }
+
 export function requestCreate(data) {
   return request({
     url: '/menu/create',
@@ -44,6 +46,7 @@ export function requestDelete(data) {
     data
   })
 }
+
 export function requestMenuButton(menucode) {
   return request({
     url: '/menu/menubuttonlist',

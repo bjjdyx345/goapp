@@ -172,7 +172,7 @@ function generateRouter(item, isParent) {
 }
 
 // componentsMap 需要在事先定义好
-export const componentsMap = import('@/views/app/sys/order') < {
+export const componentsMap = {
   example_create: () => import('@/views/example/create'), // 添加文章
   example_edit: () => import('@/views/example/edit'), // 文章编辑
   table_index: () => import('@/views/tab/index'), // 表格首页
@@ -180,7 +180,6 @@ export const componentsMap = import('@/views/app/sys/order') < {
   Menu: () => import('@/views/app/sys/menu'), // 菜单
   Admins: () => import('@/views/app/sys/admins'), // 后台管理员
   Role: () => import('@/views/app/sys/role'), // 后台角色
-  Card: () => import('@/views/app/sys/card'), // card
-  Village: () => import('@/views/app/sys/village'),
-  Order: () => import('@/views/app/sys/order')
+  Card: () => import('@/views/app/sys/card'), // test
+  Village: () => import('@/views/app/sys/village') // test
 }
