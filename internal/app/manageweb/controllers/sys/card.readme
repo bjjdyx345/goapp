@@ -1,0 +1,125 @@
+
+func(DoorcardCon) Create(c *gin.Context){
+	var dcjson=sys.Door_card{}
+	if err:=c.BindJSON(&dcjson);err!=nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
+	}
+	if((sys.IsCardId(dcjson.CardId)==nil)&&(sys.IsCardType(dcjson.CardType)==0)&& (sys.IsCardFilename(dcjson.CardContentFile)==nil)){
+		fmt.Println("----------------------------")
+		fmt.Println(dcjson)
+		fmt.Println("----------------------------")
+
+		_,res_count:=sys.QueryCardId(dcjson)
+		//has same card id please update card
+		if(res_count>0){
+			//if find the same raws
+			c.JSON(200,gin.H{
+				"errno":-2,
+				"errmsg":"has same cardid ,please update the data",
+				"data":"",
+				"trace_id":"",
+			})
+
+		}else{
+			//add new card to table
+			err:=sys.AddNewCard(dcjson)
+			if err!=nil{
+				//if add new rows wrong
+				c.JSON(200,gin.H{
+					"errno":-1,
+					"errmsg":"add rows error",
+					"data":dcjson,
+					"trace_id":"",
+				})
+
+			} else{
+				//add successful
+				c.JSON(200,gin.H{
+					"errno":0,
+					"errmsg":"successful",
+					"data":dcjson,
+					"trace_id":"",
+				})
+			}
+		}
+	}else {
+		//the para has wrong format
+		c.JSON(200,gin.H{
+			"errno":-1,
+			"errmsg":"parameters has wrong format",
+			"data":"",
+			"trace_id":"",
+		})
+	}
+
+}
+
+/*
+errorcode
+-2	same cardid
+-1	add error
+0	successful
+*/
+func (DoorcardCon) Addlist(c *gin.Context) {
+	var Cdc = sys.Door_card{}
+	//判断参数是否正确
+	cardid :=c.Query("cardid")
+	cardtype :=c.Query("cardType")
+	cardcontentfile :=c.Query("cardContentFile")
+	belong2apartment :=c.Query("belongToApartmentId")
+	fmt.Println(cardtype,cardid,cardcontentfile)
+	if((sys.IsCardId(cardid)==nil)&&(sys.IsCardFilename(cardcontentfile)==nil)&&(sys.IsCardType(cardtype)==0)){
+		//此处需要判断是否belong2apartment为可用。后期再补充
+		Cdc.CardId =cardid
+		_,res_count:=sys.QueryCardId(Cdc)
+		//has same card id please update card
+		if(res_count>0){
+			//if find the same raws
+			c.JSON(200,gin.H{
+				"errno":-2,
+				"errmsg":"has same cardid ,please update the data",
+				"data":"",
+				"trace_id":"",
+			})
+
+		}else{
+			//add new card to table
+			Cdc.CardType =cardtype
+			Cdc.CardContentFile =cardcontentfile
+			Cdc.BelongToApartmentId =belong2apartment
+			err:=sys.AddNewCard(Cdc)
+			if err!=nil{
+				//if add new rows wrong
+				c.JSON(200,gin.H{
+					"errno":-1,
+					"errmsg":"add rows error",
+					"data":Cdc,
+					"trace_id":"",
+				})
+
+			} else{
+				//add successful
+				c.JSON(200,gin.H{
+					"errno":0,
+					"errmsg":"successful",
+					"data":Cdc,
+					"trace_id":"",
+				})
+			}
+		}
+	}else {
+		//the para has wrong format
+		c.JSON(200,gin.H{
+			"errno":-1,
+			"errmsg":"parameters has wrong format",
+			"data":"",
+			"trace_id":"",
+		})
+	}
+
+
+
+}
+
+

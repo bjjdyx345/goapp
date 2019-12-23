@@ -2,7 +2,6 @@ package routers
 
 import (
 	"github.com/it234/goapp/internal/app/manageweb/controllers/sys"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,4 +36,32 @@ func RegisterRouterSys(app *gin.RouterGroup) {
 	app.POST("/role/update", role.Update)
 	app.POST("/role/create", role.Create)
 	app.POST("/role/setrole", role.SetRole)
+
+	door:=sys.DoorcardCon{}
+	app.POST("/card/create",door.Create)
+	app.POST("/card/delete",door.DeleteById)
+	app.POST("/card/update",door.Update)
+	app.GET("/card/getall",door.Getall)
+	app.GET("/card/list",door.List)
+	app.GET("/card/detail",door.Detail)
+	//app.GET("/card/query",door.Query)
+
+	village:=sys.VillageCon{}
+	app.POST("/village/create",village.Create)
+	app.POST("/village/delete",village.DeleteById)
+	app.POST("/village/update",village.Update)
+	app.GET("/village/getall",village.Getall)
+	app.GET("/village/list",village.List)
+	app.GET("/village/detail",village.Detail)
+
+	order:=sys.OrderCon{}
+	app.POST("/order/create",order.Add)
+	app.GET("/order/query",order.Query)
+	app.POST("/order/delete",order.Delete)
+	app.POST("/order/update",order.Update)
+/*
+	order:=sys.Order{}
+	app.Get("/order/create",order.Add)
+*/
+
 }

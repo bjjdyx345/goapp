@@ -160,6 +160,7 @@ func (Menu) MenuButtonList(c *gin.Context) {
 	}
 	userID := convert.ToUint64(uid)
 	menuCode := common.GetQueryToStr(c, "menucode")
+
 	if userID == 0 || menuCode == "" {
 		common.ResFail(c, "err")
 		return

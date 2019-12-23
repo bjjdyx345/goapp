@@ -31,6 +31,9 @@ func RegisterRouter(app *gin.Engine) {
 	notCheckPermissionUrlArr = append(notCheckPermissionUrlArr, apiPrefix+"/user/editpwd")
 	notCheckPermissionUrlArr = append(notCheckPermissionUrlArr, apiPrefix+"/role/rolemenuidlist")
 	notCheckPermissionUrlArr = append(notCheckPermissionUrlArr, apiPrefix+"/role/allrole")
+
+	notCheckPermissionUrlArr = append(notCheckPermissionUrlArr, apiPrefix+"/door/create")
+	notCheckPermissionUrlArr = append(notCheckPermissionUrlArr, apiPrefix+"/door/delete")
 	g.Use(middleware.CasbinMiddleware(
 		middleware.AllowPathPrefixSkipper(notCheckPermissionUrlArr...),
 	))

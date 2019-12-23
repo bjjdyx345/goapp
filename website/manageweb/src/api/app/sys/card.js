@@ -2,7 +2,15 @@ import request from '@/utils/request'
 
 export function requestList(query) {
   return request({
-    url: '/menu/list',
+    url: '/card/list',
+    method: 'get',
+    params: query
+  })
+}
+
+export function requestquery(query) {
+  return request({
+    url: '/card/query',
     method: 'get',
     params: query
   })
@@ -10,28 +18,22 @@ export function requestList(query) {
 
 export function requestAll() {
   return request({
-    url: '/menu/allmenu',
+    url: '/card/getall',
     method: 'get'
   })
 }
 
-export function requestDetail(id) {
-  return request({
-    url: '/menu/detail',
-    method: 'get',
-    params: { id }
-  })
-}
 export function requestUpdate(data) {
   return request({
-    url: '/menu/update',
+    url: '/card/update',
     method: 'post',
     data
   })
 }
+
 export function requestCreate(data) {
   return request({
-    url: '/menu/create',
+    url: '/card/create',
     method: 'post',
     data
   })
@@ -39,9 +41,17 @@ export function requestCreate(data) {
 
 export function requestDelete(data) {
   return request({
-    url: '/menu/delete',
+    url: '/card/delete',
     method: 'post',
     data
+  })
+}
+
+export function requestDetail(id) {
+  return request({
+    url: '/card/detail',
+    method: 'get',
+    params: { id }
   })
 }
 export function requestMenuButton(menucode) {
@@ -51,4 +61,12 @@ export function requestMenuButton(menucode) {
     params: { menucode }
   })
 }
-
+/*
+export function requestApartID(){
+return request({
+  url: '/card/detail',
+  method: 'get',
+  params: { id }
+})
+}
+*/

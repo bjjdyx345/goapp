@@ -1,6 +1,7 @@
 package manageweb
 
 import (
+	"github.com/it234/goapp/internal/app/manageweb/controllers/sys"
 	"net/http"
 	"time"
 
@@ -47,6 +48,7 @@ func initWeb(config *config.Config){
 	app.NoRoute(middleware.NoRouteHandler())
 	// 崩溃恢复
 	app.Use(middleware.RecoveryMiddleware())
+	app.Use(sys.HelloMiddleware())
 	app.LoadHTMLGlob(config.Web.StaticPath+"dist/*.html")
 	app.Static("/static", config.Web.StaticPath+"dist/static")
 	app.Static("/resource", config.Web.StaticPath+"resource")

@@ -33,13 +33,18 @@ func InitDB(config *config.Config) {
 	gdb.DB().SetMaxIdleConns(config.Gorm.MaxIdleConns)                                
 	gdb.DB().SetMaxOpenConns(config.Gorm.MaxOpenConns)                                
 	gdb.DB().SetConnMaxLifetime(time.Duration(config.Gorm.MaxLifetime) * time.Second) 
-  db.DB=gdb
+  	db.DB=gdb
 }
 
 func Migration() {
+
 	fmt.Println(db.DB.AutoMigrate(new(sys.Menu)).Error)
 	fmt.Println(db.DB.AutoMigrate(new(sys.Admins)).Error)
 	fmt.Println(db.DB.AutoMigrate(new(sys.RoleMenu)).Error)
 	fmt.Println(db.DB.AutoMigrate(new(sys.Role)).Error)
 	fmt.Println(db.DB.AutoMigrate(new(sys.AdminsRole)).Error)
+	fmt.Println(db.DB.AutoMigrate(new(sys.Door_card)).Error)
+	fmt.Println(db.DB.AutoMigrate(new(sys.Village)).Error)
+	fmt.Println(db.DB.AutoMigrate(new(sys.Order)).Error)
+
 }
