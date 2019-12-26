@@ -1,12 +1,146 @@
 package sys
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
 	"github.com/it234/goapp/internal/pkg/models/sys"
+	models "github.com/it234/goapp/internal/pkg/models/common"
 	"net/http"
 )
 
 type OrderCon struct {}
+
+/*
+兼容作者写法，剩余的函数可自行调用
+*/
+
+func (OrderCon) Detail(c *gin.Context) {
+	id := common.GetQueryToUint64(c, "id")
+	var order sys.Order
+	where := sys.Order{}
+	where.ID = id
+	_, err := models.First(&where, &order)
+	if err != nil {
+		common.ResErrSrv(c, err)
+		return
+	}
+	common.ResSuccess(c, &order)
+}
+
+// 分页数据
+func (OrderCon) List(c *gin.Context) {
+	page := common.GetPageIndex(c)
+	limit := common.GetPageLimit(c)
+	sort := common.GetPageSort(c)
+	key := common.GetPageKey(c)
+	var whereOrder []models.PageWhereOrder
+	order := "ID DESC"
+	if len(sort) >= 2 {
+		orderType := sort[0:1]
+		order = sort[1:len(sort)]
+		if orderType == "+" {
+			order += " ASC"
+		} else {
+			order += " DESC"
+		}
+	}
+	whereOrder = append(whereOrder, models.PageWhereOrder{Order: order})
+	if key != "" {
+		v := "%" + key + "%"
+		var arr []interface{}
+		arr = append(arr, v)
+		arr = append(arr, v)
+		// 此处需要修改 code name？？？
+		whereOrder = append(whereOrder, models.PageWhereOrder{Where: "name like ? or code like ?", Value: arr})
+	}
+	var total uint64
+	list:= []sys.Order{}
+	err := models.GetPage(&sys.Order{}, &sys.Order{}, &list, page, limit, &total, whereOrder...)
+	if err != nil {
+		common.ResErrSrv(c, err)
+		return
+	}
+	common.ResSuccessPage(c, total, &list)
+}
+
+
+func (OrderCon) DeleteById(c *gin.Context) {
+	var ids []uint64
+	err := c.Bind(&ids)
+	if err != nil || len(ids) == 0 {
+		common.ResErrSrv(c, err)
+		return
+	}
+	// 这需要改
+	//err=sys.DeleteOneOrder(ids)
+	if err != nil{
+		common.ResErrSrv(c, err)
+		return
+	}
+	common.ResSuccessMsg(c)
+}
+
+
+func (OrderCon) Getall(c *gin.Context) {
+	// 所有菜单
+	var orders []sys.Order
+	err := models.Find(&sys.Order{}, &orders, "id asc", "order_status asc")
+	if err != nil {
+		common.ResErrSrv(c, err)
+		return
+	}
+	common.ResSuccess(c, &orders)
+}
+
+
+// 更新
+func (OrderCon) Update(c *gin.Context) {
+	model := sys.Order{}
+	err := c.Bind(&model)
+	if err != nil {
+		common.ResErrSrv(c, err)
+		return
+	}
+	err = models.Save(&model)
+	if err != nil {
+		common.ResFail(c, "操作失败")
+		return
+	}
+	common.ResSuccessMsg(c)
+}
+
+//新增
+func (OrderCon) Create(c *gin.Context) {
+	order := sys.Order{}
+	err := c.Bind(&order)
+
+	if err != nil {
+		fmt.Println("bind err,",err)
+		common.ResErrSrv(c, err)
+		return
+	}
+	err=sys.IsPhoneNum(order.OrderPhoneNumber)
+	if err != nil {
+		fmt.Println("phone number err,",err)
+		common.ResFail(c, "操作失败")
+		return
+	}
+	err = models.Create(&order)
+	if err != nil {
+		fmt.Println("create err,",err)
+		common.ResFail(c, "操作失败")
+		return
+	}
+	common.ResSuccess(c, gin.H{"id": order.ID})
+}
+
+
+
+
+
+
+
 
 
 /*
@@ -77,7 +211,7 @@ func (OrderCon) Add(c *gin.Context){
 	useranme &
 	phonenumber
 */
-func (OrderCon) Delete(c *gin.Context){
+func (OrderCon) Delete_back(c *gin.Context){
 	var orderjson=sys.Order{}
 	if err:=c.BindJSON(&orderjson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
@@ -132,7 +266,7 @@ Input
 	username & phonenumber
 
 */
-func (OrderCon) Query(c *gin.Context) {
+func (OrderCon) Query_back(c *gin.Context) {
 	var orderjson = sys.Order{}
 	if err := c.BindJSON(&orderjson); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -176,7 +310,7 @@ Input
 
 */
 
-func (OrderCon) Update(c *gin.Context) {
+func (OrderCon) Update_back(c *gin.Context) {
 	var orderjson = sys.Order{}
 
 	if err := c.BindJSON(&orderjson); (err != nil && sys.IsnotNullOrder(orderjson) != nil) {

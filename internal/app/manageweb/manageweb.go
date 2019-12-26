@@ -49,6 +49,9 @@ func initWeb(config *config.Config){
 	// 崩溃恢复
 	app.Use(middleware.RecoveryMiddleware())
 	app.Use(sys.HelloMiddleware())
+	app.Use(sys.Response())
+
+
 	app.LoadHTMLGlob(config.Web.StaticPath+"dist/*.html")
 	app.Static("/static", config.Web.StaticPath+"dist/static")
 	app.Static("/resource", config.Web.StaticPath+"resource")

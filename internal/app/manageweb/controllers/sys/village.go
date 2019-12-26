@@ -1,17 +1,24 @@
 package sys
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
 	"github.com/it234/goapp/internal/pkg/models/basemodel"
-	"github.com/it234/goapp/internal/pkg/models/sys"
 	models "github.com/it234/goapp/internal/pkg/models/common"
+	"github.com/it234/goapp/internal/pkg/models/sys"
 	"net/http"
 )
 
 type VillageCon struct {}
-
+type Address struct{
+	Address_id 		uint64 	`json:"address_id" form:"address_id" binding:"-"`
+	Address_content	string 	`json:"address_content" form:"address_content" binding:"-"`
+	Address_city	string 	`json:"address_city" form:"address_city" binding:"-"`
+	Adress_village	string 	`json:"address_village" form:"address_village" binding:"-"`
+	Id_and_address	string 	`json:"id_and_address" form:"id_and_address" binding:"-"`
+}
 /*
 兼容作者写法，剩余的函数可自行调用
 */
@@ -124,6 +131,33 @@ func (VillageCon) Create(c *gin.Context) {
 	}
 	common.ResSuccess(c, gin.H{"id": card.ID})
 }
+
+//新增
+func (VillageCon) GetAllAddress(c *gin.Context) {
+	// 所有菜单
+	var queryvil sys.Village
+	var address []Address
+	var addressapd Address
+	var villages []sys.Village
+	var resCount int
+	villages,resCount =sys.QueryVillage(queryvil)
+	if resCount < 1 {
+		common.ResErrSrv(c, errors.New("has  not find the record"))
+		return
+	}
+	for i:=0;i<resCount;i++ {
+		//fmt.Println(villages[i])
+		addressapd.Address_id = villages[i].ID
+		addressapd.Address_city= fmt.Sprintf("%s-%s-%s",villages[i].VillageName,villages[i].VillageId,villages[i].VillageApartmentId)
+		addressapd.Address_content = fmt.Sprintf("%s-%s-%s-%s-%s",villages[i].VillageAtProvince,villages[i].VillageAtCity,villages[i].VillageAtDistrict,villages[i].VillageAtAddress,addressapd.Address_city)
+		addressapd.Id_and_address = fmt.Sprintf("%v|%s|%s|",villages[i].ID,villages[i].VillageAtCity,addressapd.Address_city)
+		fmt.Println(addressapd.Id_and_address)
+		address = append(address, addressapd)
+	}
+	common.ResSuccess(c,&address)
+}
+
+
 
 
 /*----------------------分割线----------------*/

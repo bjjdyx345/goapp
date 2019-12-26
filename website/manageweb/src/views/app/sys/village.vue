@@ -53,7 +53,7 @@
       />
       <el-select
         v-model="listQuery.village_id"
-        placeholder="卡类型"
+        placeholder="小区id"
         clearable
         style="width: 90px"
         class="filter-item"
@@ -223,17 +223,89 @@
         <el-form-item label="单元号" prop="village_apartment_id">
           <el-input v-model="temp.village_apartment_id" />
         </el-form-item>
-
-        <el-form-item label="所在省" prop="village_at_province">
+        <el-form-item v-if="dialogStatus==='detail'" label="所在省" prop="village_at_province">
           <el-input v-model="temp.village_at_province" />
         </el-form-item>
-
-        <el-form-item label="所在市" prop="village_at_city">
+        <el-form-item v-if="dialogStatus==='detail'" label="所在市" prop="village_at_city">
           <el-input v-model="temp.village_at_city" />
         </el-form-item>
-        <el-form-item label="所在区" prop="village_at_district">
+        <el-form-item v-if="dialogStatus==='detail'" label="所在县" prop="village_at_district">
           <el-input v-model="temp.village_at_district" />
         </el-form-item>
+
+        <el-form-item v-if="dialogStatus!=='detail'" label="所在省" prop="village_at_province">
+          <el-select
+            v-model="temp.village_at_province"
+            type="number"
+            placeholder="选择省"
+            @change="getAllSecondCity"
+          >
+            <el-option
+              v-for="item in firstcitylist"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item v-if="dialogStatus!=='detail'" label="所在市" prop="village_at_city">
+          <el-select
+            v-model="temp.village_at_city"
+            type="number"
+            placeholder="选择市区"
+            @change="getAllThirdCity"
+          >
+            <el-option
+              v-for="item in secondcitylist"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item v-if="dialogStatus!=='detail'" label="所在区县" prop="village_at_district">
+          <el-select
+            v-model="temp.village_at_district"
+            type="number"
+            placeholder="所在区县"
+          >
+            <el-option
+              v-for="item in thirdcitylist"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item v-if="dialogStatus!=='detail'" label="绑定卡号" prop="card_id">
+          <el-select
+            v-model="myselectvalue"
+            placeholder="绑定卡号"
+            value-key="id"
+            clearable
+            style="width: 180px"
+            class="filter-item"
+            @change="getBindId"
+          >
+            <el-option
+              v-for="item in cardinfolist"
+              :key="item.id"
+              :label="item.card_id"
+              :value="item.card_id"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="卡号" prop="card_id">
+          <el-input v-model="temp.card_id" :disabled="true" />
+        </el-form-item>
+        <el-form-item label="卡类型" prop="card_type">
+          <el-input v-model="temp.card_type" :disabled="true" />
+        </el-form-item>
+
         <el-form-item label="具体地址" prop="village_at_address">
           <el-input v-model="temp.village_at_address" />
         </el-form-item>
@@ -258,9 +330,11 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
 import { requestList, requestDetail, requestUpdate, requestCreate, requestAll, requestDelete, requestMenuButton } from '@/api/app/sys/village'
+import { requestFirstCityAll, requestSecondCity, requestThirdCity } from '@/api/app/sys/city'
+import { requestAll as requestCardAll, requestBindVillage } from '@/api/app/sys/card'
+
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 // import SelectTree from '@/components/TreeSelect'
@@ -282,6 +356,7 @@ export default {
       valueIdSelectTree2: 0,
       propsSelectlist: [],
       operationList: [],
+      myselectvalue: '',
       CardList: {
         add: false,
         del: false,
@@ -289,7 +364,11 @@ export default {
         update: false
       },
       tableKey: 0,
+      firstcitylist: [],
+      secondcitylist: [],
+      thirdcitylist: [],
       list: [],
+      cardinfolist: [],
       total: 0,
       listLoading: true,
       loading: true,
@@ -316,7 +395,8 @@ export default {
       ],
       temp: {
         id: 0,
-        memo: '',
+        card_id: '',
+        card_type: '',
         village_name: '',
         village_at_province: '',
         village_at_city: '',
@@ -366,7 +446,6 @@ export default {
       requestList(this.listQuery).then(response => {
         this.list = response.data.items
         this.total = response.data.total
-        alert(this.list[0].village_name)
         this.listLoading = false
       })
     },
@@ -379,11 +458,38 @@ export default {
         }
       })
     },
+    getAllFirstCity() {
+      requestFirstCityAll().then(response => {
+        this.firstcitylist = response.data
+      })
+    },
+    getAllSecondCity(cityname) {
+      this.secondcitylist = []
+      if (cityname !== '') {
+        requestSecondCity(cityname).then(response => {
+          this.secondcitylist = response.data
+          // alert('has request leve2 city')
+        })
+      }
+    },
+    getAllThirdCity(cityname) {
+      this.thirdcitylist = []
+      if (cityname !== '') {
+        requestThirdCity(cityname).then(response => {
+          this.thirdcitylist = response.data
+          // alert('has request leve3 city')
+        })
+      }
+    },
+    getBindId(val) {
+      console.log(val)
+      const obj = this.cardinfolist.find(function(item) {
+        return item.card_id === val
+      })
+      this.temp.card_type = obj.card_type
+      this.temp.card_id = obj.card_id
+    },
     handleFilter(val) {
-      // this.listQuery.parent_id = this.valueIdSelectTree
-      // this.listQuery.page = 1
-      // alert(val)
-      this.temp.card_type = val
       this.getList()
     },
     sortChange(data) {
@@ -401,16 +507,15 @@ export default {
       this.valueIdSelectTree2 = 0
       this.temp = {
         id: 0,
-        memo: '',
-        name: '',
-        url: '',
-        code: '',
-        icon: 'list',
-        operate_type: 'none',
-        parent_id: 0,
-        menu_type: 2,
-        status: 1,
-        sequence: 10
+        card_id: '',
+        card_type: '',
+        village_name: '',
+        village_at_province: '',
+        village_at_city: '',
+        village_at_district: '',
+        village_id: '',
+        village_apartment_id: '',
+        village_at_address: ''
       }
     },
     handleCreate() {
@@ -420,6 +525,9 @@ export default {
       this.loading = false
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
+      })
+      requestFirstCityAll().then(response => {
+        this.firstcitylist = response.data
       })
     },
     createData() {
@@ -456,13 +564,22 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    handleUpdate(id) {
+    handleUpdate: function(id) {
       this.loading = true
       requestDetail(id).then(response => {
         this.loading = false
         this.temp = response.data
         this.valueIdSelectTree2 = this.temp.parent_id
       })
+      this.temp.id = id // need to give this id to
+      requestFirstCityAll().then(response => {
+        this.firstcitylist = response.data
+      })
+      requestCardAll().then(response => {
+        this.cardinfolist = []
+        this.cardinfolist = response.data
+      })
+
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -495,6 +612,9 @@ export default {
           })
         }
       })
+      console.log(this.temp)
+      requestBindVillage(this.temp.card_id, this.temp.card_type, this.temp.id)
+      // need to bind id
     },
     handleDelete(row) {
       var ids = []

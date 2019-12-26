@@ -180,6 +180,7 @@ export const componentsMap = {
   Menu: () => import('@/views/app/sys/menu'), // 菜单
   Admins: () => import('@/views/app/sys/admins'), // 后台管理员
   Role: () => import('@/views/app/sys/role'), // 后台角色
-  Card: () => import('@/views/app/sys/card'), // test
-  Village: () => import('@/views/app/sys/village') // test
+  Card: () => import('@/views/app/sys/card'), // 卡管理
+  Village: () => import('@/views/app/sys/village'), // 小区信息管理
+  Book: () => import('@/views/app/sys/book') // 订单管理
 }

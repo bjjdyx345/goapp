@@ -3,7 +3,27 @@
     <div class="filter-container">
       <el-input
         v-model="listQuery.id"
-        placeholder="卡号"
+        placeholder="ID"
+        clearable
+        prefix-icon="el-icon-search"
+        style="width: 90px;"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+        @clear="handleFilter"
+      />
+      <el-input
+        v-model="listQuery.order_username"
+        placeholder="姓名"
+        clearable
+        prefix-icon="el-icon-search"
+        style="width: 90px;"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+        @clear="handleFilter"
+      />
+      <el-input
+        v-model="listQuery.order_status"
+        placeholder="订单状态"
         clearable
         prefix-icon="el-icon-search"
         style="width: 200px;"
@@ -11,22 +31,6 @@
         @keyup.enter.native="handleFilter"
         @clear="handleFilter"
       />
-      <el-select
-        v-model="listQuery.cardtype"
-        placeholder="卡类型"
-        clearable
-        style="width: 90px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in menuTypeOptions"
-          :key="item.key"
-          :label="item.display_name"
-          :value="item.key"
-        />
-      </el-select>
-
       <el-select
         v-model="listQuery.sort"
         style="width: 140px"
@@ -83,29 +87,39 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column label="ID" align="center">
+      <el-table-column label="订单ID" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="卡ID" align="center">
+      <el-table-column label="姓名" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.card_id }}</span>
+          <span>{{ scope.row.order_username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="卡类型" align="center">
+      <el-table-column label="手机号" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.card_type }}</span>
+          <span>{{ scope.row.order_phone_number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="卡内容" align="center">
+      <el-table-column label="卡号" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.card_contentfile }}</span>
+          <span>{{ scope.row.order_card_id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="卡所属小区ID" align="center">
+      <el-table-column label="订单价格" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.belong_to_apartment_id }}</span>
+          <span>{{ scope.row.order_price }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="订单地址ID" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.order_address }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="订单状态" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.order_status }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -163,35 +177,79 @@
         label-width="80px"
         style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="卡ID" prop="card_id">
-          <el-input v-model="temp.card_id" />
+        <el-form-item label="姓名" prop="order_username">
+          <el-input v-model="temp.order_username" />
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='detail'" label="卡类型" prop="card_card_type">
-          <el-input v-model="temp.card_type" />
+        <el-form-item label="手机号" prop="order_phone_number">
+          <el-input v-model="temp.order_phone_number" type="tel" />
         </el-form-item>
-        <el-form-item v-if="dialogStatus!=='detail'" label="卡类型" prop="card_type">
+        <el-form-item label="卡号" prop="order_card_id">
+          <el-input v-model="temp.order_card_id" />
+        </el-form-item>
+        <el-form-item label="价格" prop="order_price">
+          <el-input v-model.number="temp.order_price" type="number" />
+        </el-form-item>
+
+        <el-form-item v-if="dialogStatus==='detail'" label="订单状态" prop="order_status">
+          <el-input v-model="temp.order_status" :disabled="true" />
+        </el-form-item>
+
+        <el-form-item v-if="dialogStatus!=='detail'" label="订单状态" prop="order_status">
           <el-select
-            v-model="temp.cardtype"
-            placeholder="卡类型"
-            clearable
-            style="width: 180px"
-            class="filter-item"
-            @change="handleFilter"
+            v-model="temp.order_status"
+            type="number"
+            placeholder="订单状态"
           >
             <el-option
-              v-for="item in menuTypeOptions"
+              v-for="item in orderstatusTypeOptions"
               :key="item.key"
               :label="item.display_name"
               :value="item.display_name"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="卡片内容" prop="card_contentfile">
-          <el-input v-model="temp.card_contentfile" />
+
+        <el-form-item v-if="dialogStatus!=='detail'" label="绑定卡号" prop="order_card_id">
+          <el-select
+            v-model="temp.order_card_id"
+            type="number"
+            placeholder="绑定卡号"
+            @change="getBindAddress"
+          >
+            <el-option
+              v-for="item in cardlist"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
         </el-form-item>
 
-        <el-form-item label="卡片所属单元楼" prop="belong_to_apartment_id">
-          <el-input v-model="temp.belong_to_apartment_id" />
+        <el-form-item v-if="dialogStatus!=='detail'" label="绑定地址" prop="address_id">
+          <el-select
+            v-model="myselectvalue"
+            placeholder="绑定卡号"
+            value-key="address_id"
+            clearable
+            style="width: 180px"
+            class="filter-item"
+            @change="getAddressId"
+          >
+            <el-option
+              v-for="item in addresslist"
+              :key="item.address_id"
+              :label="item.id_and_address"
+              :value="item.address_id"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="具体地址" prop="address_id">
+          <el-input
+            v-model="temp.address_content"
+            rows="5"
+            :type="textarea"
+          />
         </el-form-item>
       </el-form>
       <div
@@ -216,30 +274,32 @@
 </template>
 
 <script>
-import { requestList, requestDetail, requestUpdate, requestCreate, requestAll, requestDelete, requestMenuButton } from '@/api/app/sys/card'
+import { requestList, requestDetail, requestUpdate, requestCreate, requestAll, requestDelete } from '@/api/app/sys/book'
+import { requestMenuButton } from '@/api/app/sys/menu'
+import { requestFirstCityAll, requestSecondCity, requestThirdCity } from '@/api/app/sys/city'
+import { requestAllVillageAddress } from '@/api/app/sys/village'
+
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 // import SelectTree from '@/components/TreeSelect'
 import { checkAuthAdd, checkAuthDel, checkAuthView, checkAuthUpdate } from '@/utils/permission'
 
-const menuTypeOptions = [
-  { key: 1, display_name: 'ISO14443A' },
-  { key: 2, display_name: 'ISO14443B' },
-  { key: 3, display_name: 'LOWFREQ_125K' }
+const orderstatusTypeOptions = [
+  { key: 1, display_name: 'start' },
+  { key: 2, display_name: 'Unconfirmed' },
+  { key: 3, display_name: 'Confirmed' },
+  { key: 4, display_name: 'Delivering' },
+  { key: 5, display_name: 'Done' }
 ]
 
 export default {
-  name: 'Card',
+  name: 'Order',
   components: { Pagination }, // SelectTree
   directives: { waves },
   data() {
     return {
       valueIdSelectTree: 0,
-      valueIdSelectTree2: 0,
       propsSelectlist: [],
-      propsSelectlist2: [
-        { id: 0, parent_id: -1, name: '顶级' }
-      ],
       operationList: [],
       CardList: {
         add: false,
@@ -247,7 +307,13 @@ export default {
         view: false,
         update: false
       },
+      myselectvalue: '',
+      orderstatusTypeOptions,
       tableKey: 0,
+      addresslist: [],
+      firstcitylist: [],
+      secondcitylist: [],
+      cardlist: [],
       list: [],
       total: 0,
       listLoading: true,
@@ -257,10 +323,14 @@ export default {
         limit: 20,
         id: undefined,
         key: undefined,
-        cardtype: undefined,
+        order_card_id: undefined,
+        order_username: undefined,
+        order_phone_number: undefined,
+        order_address: undefined,
+        order_price: undefined,
+        order_status: undefined,
         sort: '-id'
       },
-      menuTypeOptions,
       sortOptions: [
         { label: 'ID Ascending', key: '+id' },
         { label: 'ID Descending', key: '-id' },
@@ -269,11 +339,15 @@ export default {
       ],
       temp: {
         id: 0,
-        memo: '',
-        cardid: '',
-        cardtype: '',
-        belongtoapartmentid: '',
-        cardcontentfilename: 'default'
+        order_card_id: '',
+        order_username: '',
+        order_phone_number: '',
+        order_address: '',
+        order_price: 0,
+        order_status: '',
+        address_id: 0,
+        address_content: '',
+        address_city: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -283,10 +357,10 @@ export default {
         detail: '详情'
       },
       rules: {
-        type: [{ required: true, message: '请选择卡片类型', trigger: 'change' }],
-        name: [{ required: true, message: '请输入卡片id', trigger: 'blur' }],
-        code: [{ required: true, message: '请输入卡片文件名', trigger: 'blur' }],
-        sequence: [{ required: true, message: '请输入排序值', trigger: 'blur' }]
+        type: [{ required: true, message: '请输入', trigger: 'change' }],
+        order_name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        order_phone_number: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
+        order_address: [{ required: true, message: '请输入地址', trigger: 'blur' }]
       },
       multipleSelection: []
     }
@@ -305,7 +379,7 @@ export default {
       this.CardList.update = checkAuthUpdate(this.operationList)
     },
     getMenuButton() {
-      requestMenuButton('Card').then(response => {
+      requestMenuButton('Book').then(response => {
         this.operationList = response.data
       }).then(() => {
         this.checkPermission()
@@ -328,10 +402,38 @@ export default {
         }
       })
     },
+    getAllFirstCity() {
+      requestFirstCityAll().then(response => {
+        this.firstcitylist = response.data
+      })
+    },
+    getAllSecondCity(cityname) {
+      this.secondcitylist = []
+      if (cityname !== '') {
+        requestSecondCity(cityname).then(response => {
+          this.secondcitylist = response.data
+          // alert('has request leve2 city')
+        })
+      }
+    },
+    getBindAddress(cityname) {
+      this.thirdcitylist = []
+      if (cityname !== '') {
+        requestThirdCity(cityname).then(response => {
+          this.thirdcitylist = response.data
+          // alert('has request leve3 city')
+        })
+      }
+    },
+    getAddressId: function(val) {
+      const obj = this.addresslist.find(function(item) {
+        return item.address_id === val
+      })
+      // console.log( obj )
+      this.temp.address_id = obj.address_id
+      this.temp.address_content = obj.address_content
+    },
     handleFilter(val) {
-      // this.listQuery.parent_id = this.valueIdSelectTree
-      // this.listQuery.page = 1
-      // alert(val)
       this.temp.card_type = val
       this.getList()
     },
@@ -347,19 +449,15 @@ export default {
       this.handleFilter()
     },
     resetTemp() {
-      this.valueIdSelectTree2 = 0
+    //  this.valueIdSelectTree2 = 0
       this.temp = {
         id: 0,
-        memo: '',
-        name: '',
-        url: '',
-        code: '',
-        icon: 'list',
-        operate_type: 'none',
-        parent_id: 0,
-        menu_type: 2,
-        status: 1,
-        sequence: 10
+        order_card_id: '',
+        order_username: '',
+        order_phone_number: '',
+        order_address: '',
+        order_price: 0,
+        order_status: ''
       }
     },
     handleCreate() {
@@ -369,6 +467,11 @@ export default {
       this.loading = false
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
+      })
+      requestAllVillageAddress().then(response => {
+        console.log(response)
+        this.addresslist = response.data
+        // console.log(this.addresslist)
       })
     },
     createData() {
@@ -405,12 +508,19 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    handleUpdate(id) {
+    handleUpdate: function(id) {
       this.loading = true
       requestDetail(id).then(response => {
         this.loading = false
         this.temp = response.data
-        this.valueIdSelectTree2 = this.temp.parent_id
+      })
+      requestFirstCityAll().then(response => {
+        this.firstcitylist = response.data
+      })
+      requestAllVillageAddress().then(response => {
+        console.log(response)
+        this.addresslist = response.data
+        // console.log(this.addresslist)
       })
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -474,8 +584,6 @@ export default {
       if (type === 1) {
         this.valueIdSelectTree = value
         this.handleFilter()
-      } else {
-        this.valueIdSelectTree2 = value
       }
     },
     handleSelectionChange(val) {

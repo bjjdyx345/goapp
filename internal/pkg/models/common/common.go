@@ -92,6 +92,19 @@ func Find(where interface{},out interface{},orders ...string)error{
 	}
 	return db.Find(out).Error
 }
+//Find with result count
+func Find_Conut(where interface{},out interface{},orders ...string)int{
+	var res_count int
+	db:=db.DB.Where(where)
+	if len(orders)>0 {
+		for _,order:=range orders {
+			db=db.Order(order)
+		}
+	}
+	db.Find(out).Count(&res_count)
+	return res_count
+}
+
 
 // Scan
 func Scan(model,where interface{},out interface{})(notFound bool,err error){

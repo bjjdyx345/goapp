@@ -37,20 +37,24 @@ func IsExistCity(cityname string) int{
 	return res_count
 }
 
-func GetCitys(cityname string,citylevel int) []*string{
+func GetCitys(cityname string,citylevel int) []string{
 	var cinfo CityInfo
 	var value []CityInfo
 	var res_count=1
-	nextlevelname:=[]*string{}
-	if(citylevel==0){
-		cinfo.LevelType=1
-	} else{
+	nextlevelname:=[]string{}
+	cinfo.LevelType = citylevel
+	fmt.Println("level type is",citylevel)
+	if(citylevel==1){
 		cinfo.Name=cityname
-		cinfo.LevelType=citylevel
+		db.DB.Where(&cinfo).Find(&value).Count(&res_count)
+	} else {
+		cinfo.Name = fmt.Sprintf("%%%s%%",cityname)
+		fmt.Println(cinfo)
+		db.DB.Where("level_type = ? AND merger_name LIKE ?", cinfo.LevelType, cinfo.Name).Find(&value).Count(&res_count)
 	}
-	db.DB.Where(&cinfo).Find(&value).Count(&res_count)
-	for i:=0;i<res_count;i++{
-		nextlevelname =append(nextlevelname,&value[i].Name)
+
+	for i:=0;i<res_count;i++ {
+		nextlevelname = append(nextlevelname, value[i].Name)
 		//must use *firstlever[i]取出里边的内容
 	}
 	return nextlevelname

@@ -14,7 +14,7 @@ import (
 //订单表结构
 type Order struct {
 	basemodel.Model
-	OrderCardId			string		`gorm:"column:order_card_id;type:varchar(30);not null;" json:"order_card_id" form:"order_card_id binding:"-"`
+	OrderCardId			string	`gorm:"column:order_card_id;type:varchar(30);not null;" json:"order_card_id" form:"order_card_id binding:"-"`
 	OrderUsername 		string 	`gorm:"column:order_username;type:varchar(30);" json:"order_username" form:"order_username" binding:"required"`
 	OrderPhoneNumber 	string	`gorm:"column:order_phone_number;type:varchar(15);" json:"order_phone_number" form:"order_phone_number" binding:"required"`
 	OrderAddress		string	`gorm:"column:order_address;type:varchar(30);not null;" json:"order_address" form:"order_address" binding:"-"`

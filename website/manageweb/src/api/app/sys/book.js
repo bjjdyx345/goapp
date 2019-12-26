@@ -2,21 +2,30 @@ import request from '@/utils/request'
 
 export function requestList(query) {
   return request({
-    url: '/village/list',
+    url: '/order/list',
     method: 'get',
     params: query
   })
 }
+
+export function requestquery(query) {
+  return request({
+    url: '/order/query',
+    method: 'get',
+    params: query
+  })
+}
+
 export function requestAll() {
   return request({
-    url: '/village/getall',
+    url: '/order/getall',
     method: 'get'
   })
 }
 
 export function requestUpdate(data) {
   return request({
-    url: '/village/update',
+    url: '/order/update',
     method: 'post',
     data
   })
@@ -24,7 +33,7 @@ export function requestUpdate(data) {
 
 export function requestCreate(data) {
   return request({
-    url: '/village/create',
+    url: '/order/create',
     method: 'post',
     data
   })
@@ -32,7 +41,7 @@ export function requestCreate(data) {
 
 export function requestDelete(data) {
   return request({
-    url: '/village/delete',
+    url: '/order/delete',
     method: 'post',
     data
   })
@@ -40,23 +49,9 @@ export function requestDelete(data) {
 
 export function requestDetail(id) {
   return request({
-    url: '/village/detail',
+    url: '/order/detail',
     method: 'get',
     params: { id }
-  })
-}
-export function requestAllVillageAddress() {
-  return request({
-    url: '/village/getalladdress',
-    method: 'get'
-  })
-}
-
-export function requestMenuButton(menucode) {
-  return request({
-    url: '/menu/menubuttonlist',
-    method: 'get',
-    params: { menucode }
   })
 }
 

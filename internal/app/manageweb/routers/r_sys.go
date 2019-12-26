@@ -44,6 +44,7 @@ func RegisterRouterSys(app *gin.RouterGroup) {
 	app.GET("/card/getall",door.Getall)
 	app.GET("/card/list",door.List)
 	app.GET("/card/detail",door.Detail)
+	app.POST("/card/bindvillage",door.BindApartmentId)
 	//app.GET("/card/query",door.Query)
 
 	village:=sys.VillageCon{}
@@ -53,12 +54,20 @@ func RegisterRouterSys(app *gin.RouterGroup) {
 	app.GET("/village/getall",village.Getall)
 	app.GET("/village/list",village.List)
 	app.GET("/village/detail",village.Detail)
+	app.GET("/village/getalladdress",village.GetAllAddress)
 
 	order:=sys.OrderCon{}
-	app.POST("/order/create",order.Add)
-	app.GET("/order/query",order.Query)
-	app.POST("/order/delete",order.Delete)
+	app.POST("/order/create",order.Create)
+	app.GET("/order/getall",order.Getall)
+	app.POST("/order/delete",order.DeleteById)
 	app.POST("/order/update",order.Update)
+	app.GET("/order/list",order.List)
+	app.GET("/order/detail",order.Detail)
+
+	city:=sys.CityInfoCon{}
+	app.GET("/city/getfirstcity",city.GetFirstCityAll)
+	app.GET("/city/getsecondcity",city.GetSecondCity)
+	app.GET("/city/getthirdcity",city.GetThirdCity)
 /*
 	order:=sys.Order{}
 	app.Get("/order/create",order.Add)

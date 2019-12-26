@@ -89,13 +89,13 @@ func DeleteOneCard(dc Door_card) error{
 }
 //删除卡
 func DeleteOneCardById(ids []uint64) error {
-	var dcjson = Door_card{}
+
 	for _, v := range ids {
+		fmt.Println(v)
+		var dcjson = Door_card{}
 		dcjson.ID = v
-		if err := db.DB.Delete(dcjson).Error; err != nil {
+		if err := DeleteOneCard(dcjson); err != nil {
 			return err
-		} else {
-			return nil
 		}
 	}
 	return nil

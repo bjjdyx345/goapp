@@ -169,7 +169,7 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-
+    <!-- 小窗口 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
         ref="dataForm"

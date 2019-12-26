@@ -55,7 +55,6 @@ func UpdateVillage(village Village) {
 
 //查询订单信息
 func QueryVillage(village Village)([]Village,int) {
-
 	var value []Village
 	res_count:=1
 	res:=db.DB.Where(&village).Find(&value).Count(&res_count)
@@ -65,9 +64,10 @@ func QueryVillage(village Village)([]Village,int) {
 		res_count=-1
 		return value,-1
 	}
-
 	return value ,res_count
 }
+
+
 
 //删除订单（未知订单数量）
 func DeleteVillages(village Village)(int,error){

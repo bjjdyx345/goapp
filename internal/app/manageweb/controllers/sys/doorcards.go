@@ -2,6 +2,7 @@ package sys
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
@@ -113,6 +114,25 @@ func (DoorcardCon) Update(c *gin.Context) {
 	common.ResSuccessMsg(c)
 }
 
+/*
+给卡片绑定一个village的id，不是village_id
+确保一对一
+*/
+func (DoorcardCon) BindApartmentId(c *gin.Context) {
+	model := sys.Door_card{}
+	model.CardId=c.Query("card_id")
+	model.CardType=c.Query("card_type")
+	save_model,res_count:=sys.QueryCardId(model)
+	if(res_count!=1||model.CardId==""||model.CardType==""){
+		common.ResErrSrv(c, errors.New("no such record"))
+		return
+	}else {
+		save_model[0].BelongToApartmentId =c.Query("village_id")
+	}
+	sys.UpdateCard(save_model[0])
+	common.ResSuccessMsg(c)
+}
+
 //新增
 func (DoorcardCon) Create(c *gin.Context) {
 	card := sys.Door_card{}
@@ -128,6 +148,11 @@ func (DoorcardCon) Create(c *gin.Context) {
 	}
 	common.ResSuccess(c, gin.H{"id": card.ID})
 }
+
+
+
+
+
 
 /*---------------------------分割线，预留函数-----------------------------------------------*/
 func(DoorcardCon) Create_back(c *gin.Context){
@@ -409,16 +434,34 @@ func (DoorcardCon) Delete(c *gin.Context) {
 }
 //中间件，负责打印请求
 func HelloMiddleware() gin.HandlerFunc {
-	fmt.Println("USB middleware")
 	return func(ctx *gin.Context) {
 		data,err := ctx.GetRawData()
+		url:=ctx.Request.URL
 		if err != nil{
 			fmt.Println(err.Error())
 		}
 		fmt.Printf("data: %v\n",string(data))
-
+		fmt.Println("url: ",url)
 		ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data)) // 关键点
 		ctx.Next()
 	}
 
+}
+
+// middleware get response msg
+func Response() gin.HandlerFunc {
+	fmt.Println("has got response")
+
+	return func(c *gin.Context) {
+		c.Next()
+		if c.Writer.Written() {
+			return
+		}
+		params := c.Keys
+		fmt.Println(params)
+		if len(params) == 0 {
+			return
+		}
+		c.JSON(http.StatusOK, params)
+	}
 }

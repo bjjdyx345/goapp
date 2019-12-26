@@ -61,6 +61,14 @@ export function requestMenuButton(menucode) {
     params: { menucode }
   })
 }
+
+export function requestBindVillage(card_id, card_type, village_id) {
+  return request({
+    url: '/card/bindvillage',
+    method: 'post',
+    params: { card_id, card_type, village_id }
+  })
+}
 /*
 export function requestApartID(){
 return request({
