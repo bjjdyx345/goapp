@@ -1,10 +1,11 @@
-package sys
+package card
 
 import (
 	"errors"
 	"fmt"
 	"github.com/it234/goapp/internal/pkg/models/basemodel"
 	"github.com/it234/goapp/internal/pkg/models/db"
+	"github.com/it234/goapp/internal/pkg/models/sys"
 	"github.com/jinzhu/gorm"
 	"regexp"
 	"strconv"
@@ -23,7 +24,7 @@ type Order struct {
 }
 
 func (Order) TableName() string {
-	return TableName("order")
+	return sys.TableName("order")
 }
 // 添加前
 func (m *Order) BeforeCreate(scope *gorm.Scope) error {

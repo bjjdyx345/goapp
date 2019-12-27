@@ -1,4 +1,4 @@
-package sys
+package card
 
 import (
 	"bytes"
@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
 	"github.com/it234/goapp/internal/pkg/models/basemodel"
+	card2 "github.com/it234/goapp/internal/pkg/models/card"
 	models "github.com/it234/goapp/internal/pkg/models/common"
-	"github.com/it234/goapp/internal/pkg/models/sys"
 	"io/ioutil"
 	"net/http"
 	_ "strconv"
@@ -23,8 +23,8 @@ type DoorcardCon struct {}
 
 func (DoorcardCon) Detail(c *gin.Context) {
 	id := common.GetQueryToUint64(c, "id")
-	var card sys.Door_card
-	where := sys.Door_card{}
+	var card card2.Door_card
+	where := card2.Door_card{}
 	where.ID = id
 	_, err := models.First(&where, &card)
 	if err != nil {
@@ -60,8 +60,8 @@ func (DoorcardCon) List(c *gin.Context) {
 		whereOrder = append(whereOrder, models.PageWhereOrder{Where: "name like ? or code like ?", Value: arr})
 	}
 	var total uint64
-	list:= []sys.Door_card{}
-	err := models.GetPage(&sys.Door_card{}, &sys.Door_card{}, &list, page, limit, &total, whereOrder...)
+	list:= []card2.Door_card{}
+	err := models.GetPage(&card2.Door_card{}, &card2.Door_card{}, &list, page, limit, &total, whereOrder...)
 	if err != nil {
 		common.ResErrSrv(c, err)
 		return
@@ -77,7 +77,7 @@ func (DoorcardCon) DeleteById(c *gin.Context) {
 		common.ResErrSrv(c, err)
 		return
 	}
-	err=sys.DeleteOneCardById(ids)
+	err= card2.DeleteOneCardById(ids)
 	if err != nil{
 		common.ResErrSrv(c, err)
 		return
@@ -88,8 +88,8 @@ func (DoorcardCon) DeleteById(c *gin.Context) {
 
 func (DoorcardCon) Getall(c *gin.Context) {
 	// 所有菜单
-		var doors []sys.Door_card
-		err := models.Find(&sys.Door_card{}, &doors, "id asc", "card_id asc")
+		var doors []card2.Door_card
+		err := models.Find(&card2.Door_card{}, &doors, "id asc", "card_id asc")
 		if err != nil {
 			common.ResErrSrv(c, err)
 			return
@@ -100,7 +100,7 @@ func (DoorcardCon) Getall(c *gin.Context) {
 
 // 更新
 func (DoorcardCon) Update(c *gin.Context) {
-	model := sys.Door_card{}
+	model := card2.Door_card{}
 	err := c.Bind(&model)
 	if err != nil {
 		common.ResErrSrv(c, err)
@@ -119,23 +119,23 @@ func (DoorcardCon) Update(c *gin.Context) {
 确保一对一
 */
 func (DoorcardCon) BindApartmentId(c *gin.Context) {
-	model := sys.Door_card{}
+	model := card2.Door_card{}
 	model.CardId=c.Query("card_id")
 	model.CardType=c.Query("card_type")
-	save_model,res_count:=sys.QueryCardId(model)
+	save_model,res_count:= card2.QueryCardId(model)
 	if(res_count!=1||model.CardId==""||model.CardType==""){
 		common.ResErrSrv(c, errors.New("no such record"))
 		return
 	}else {
 		save_model[0].BelongToApartmentId =c.Query("village_id")
 	}
-	sys.UpdateCard(save_model[0])
+	card2.UpdateCard(save_model[0])
 	common.ResSuccessMsg(c)
 }
 
 //新增
 func (DoorcardCon) Create(c *gin.Context) {
-	card := sys.Door_card{}
+	card := card2.Door_card{}
 	err := c.Bind(&card)
 	if err != nil {
 		common.ResErrSrv(c, err)
@@ -156,17 +156,17 @@ func (DoorcardCon) Create(c *gin.Context) {
 
 /*---------------------------分割线，预留函数-----------------------------------------------*/
 func(DoorcardCon) Create_back(c *gin.Context){
-	var dcjson=sys.Door_card{}
+	var dcjson= card2.Door_card{}
 	if err:=c.BindJSON(&dcjson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
-	if((sys.IsCardId(dcjson.CardId)==nil)&&(sys.IsCardType(dcjson.CardType)==0)&& (sys.IsCardFilename(dcjson.CardContentFile)==nil)){
+	if((card2.IsCardId(dcjson.CardId)==nil)&&(card2.IsCardType(dcjson.CardType)==0)&& (card2.IsCardFilename(dcjson.CardContentFile)==nil)){
 		fmt.Println("----------------------------")
 		fmt.Println(dcjson)
 		fmt.Println("----------------------------")
 
-		_,res_count:=sys.QueryCardId(dcjson)
+		_,res_count:= card2.QueryCardId(dcjson)
 		//has same card id please update card
 		if(res_count>0){
 			//if find the same raws
@@ -179,7 +179,7 @@ func(DoorcardCon) Create_back(c *gin.Context){
 
 		}else{
 			//add new card to table
-			err:=sys.AddNewCard(dcjson)
+			err:= card2.AddNewCard(dcjson)
 			if err!=nil{
 				//if add new rows wrong
 				c.JSON(200,gin.H{
@@ -218,17 +218,17 @@ errorcode
 0	successful
 */
 func (DoorcardCon) Addlist(c *gin.Context) {
-	var Cdc = sys.Door_card{}
+	var Cdc = card2.Door_card{}
 	//判断参数是否正确
 	cardid :=c.Query("cardid")
 	cardtype :=c.Query("cardType")
 	cardcontentfile :=c.Query("cardContentFile")
 	belong2apartment :=c.Query("belongToApartmentId")
 	fmt.Println(cardtype,cardid,cardcontentfile)
-	if((sys.IsCardId(cardid)==nil)&&(sys.IsCardFilename(cardcontentfile)==nil)&&(sys.IsCardType(cardtype)==0)){
+	if((card2.IsCardId(cardid)==nil)&&(card2.IsCardFilename(cardcontentfile)==nil)&&(card2.IsCardType(cardtype)==0)){
 		//此处需要判断是否belong2apartment为可用。后期再补充
 		Cdc.CardId =cardid
-		_,res_count:=sys.QueryCardId(Cdc)
+		_,res_count:= card2.QueryCardId(Cdc)
 		//has same card id please update card
 		if(res_count>0){
 			//if find the same raws
@@ -244,7 +244,7 @@ func (DoorcardCon) Addlist(c *gin.Context) {
 			Cdc.CardType =cardtype
 			Cdc.CardContentFile =cardcontentfile
 			Cdc.BelongToApartmentId =belong2apartment
-			err:=sys.AddNewCard(Cdc)
+			err:= card2.AddNewCard(Cdc)
 			if err!=nil{
 				//if add new rows wrong
 				c.JSON(200,gin.H{
@@ -285,12 +285,12 @@ errno:
 
 */
 func (DoorcardCon) Update_back(c *gin.Context) {
-	var dcjson = sys.Door_card{}
+	var dcjson = card2.Door_card{}
 	if err:=c.BindJSON(&dcjson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
-	if(dcjson.ID<1||sys.IsCardId(c.Query(dcjson.CardId))!=nil){
+	if(dcjson.ID<1|| card2.IsCardId(c.Query(dcjson.CardId))!=nil){
 		c.JSON(200,gin.H{
 			"errno":-3,
 			"errmsg":"please upload id  ",
@@ -301,7 +301,7 @@ func (DoorcardCon) Update_back(c *gin.Context) {
 	}
 	//此处可以不查询卡id，如果查询卡id就不能更改id了，查询只按唯一key查
 	var (
-		_, res_count = sys.QueryCardId(sys.Door_card{
+		_, res_count = card2.QueryCardId(card2.Door_card{
 			Model: basemodel.Model{
 				ID: dcjson.ID,
 			},
@@ -326,7 +326,7 @@ func (DoorcardCon) Update_back(c *gin.Context) {
 			"trace_id":"",
 		})
 	}else{
-		err:=sys.UpdateCard(dcjson)
+		err:= card2.UpdateCard(dcjson)
 		if(err!=0){
 			c.JSON(200,gin.H{
 				"errno":-2,
@@ -347,14 +347,14 @@ func (DoorcardCon) Update_back(c *gin.Context) {
 }
 
 func (DoorcardCon) Query(c *gin.Context) {
-	var dcjson = sys.Door_card{}
+	var dcjson = card2.Door_card{}
 
 	if err:=c.BindJSON(&dcjson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
 	//保证其中一个有值
-	if(sys.IsCardId(dcjson.CardId)!=nil&&sys.IsCardType(dcjson.CardType)!=0){
+	if(card2.IsCardId(dcjson.CardId)!=nil&& card2.IsCardType(dcjson.CardType)!=0){
 		c.JSON(200,gin.H{
 			"errno":-1,
 			"errmsg":"the cardid or cardtype must has value",
@@ -365,9 +365,9 @@ func (DoorcardCon) Query(c *gin.Context) {
 		return
 	}
 	/*此处需要应答一个cdc结构体，不需要返回值*/
-	var doorcdc []sys.Door_card
+	var doorcdc []card2.Door_card
 	var res_count=0
-	doorcdc,res_count=sys.QueryCardId(dcjson)
+	doorcdc,res_count= card2.QueryCardId(dcjson)
 	if(res_count>0){
 		c.JSON(200,gin.H{
 			"errno":0,
@@ -395,7 +395,7 @@ cardid不是必须的
 
 */
 func (DoorcardCon) Delete(c *gin.Context) {
-	var dcjson = sys.Door_card{}
+	var dcjson = card2.Door_card{}
 
 	if err:=c.BindJSON(&dcjson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
@@ -413,7 +413,7 @@ func (DoorcardCon) Delete(c *gin.Context) {
 		})
 		return
 	}else {
-		err:=sys.DeleteCards(dcjson)
+		err:= card2.DeleteCards(dcjson)
 		if(err==nil){
 			c.JSON(200,gin.H{
 				"errno":-1,

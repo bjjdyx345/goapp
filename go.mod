@@ -25,7 +25,16 @@ replace (
 )
 
 require (
+	github.com/Bowery/prompt v0.0.0-20190916142128-fa8279994f75 // indirect
+	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185 // indirect
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/it234/goapp/internal v0.0.0-00010101000000-000000000000 // indirect
-	github.com/it234/goapp/pkg v0.0.0-00010101000000-000000000000 // indirect
+	github.com/it234/goapp/pkg v0.0.0-20191215140828-a71f2a37cc83 // indirect
+	github.com/it234/gowebssh/internal v0.0.0-20191110125613-8e4609d64a1f // indirect
+	github.com/it234/gowebssh/pkg v0.0.0-20191110125613-8e4609d64a1f // indirect
 	github.com/jinzhu/gorm v1.9.11 // indirect
+	github.com/kardianos/govendor v1.0.9 // indirect
+	golang.org/x/sys v0.0.0-20191224085550-c709ea063b76 // indirect
+	golang.org/x/tools v0.0.0-20191227053925-7b8e75db28f4 // indirect
+	gopkg.in/yaml.v2 v2.2.7 // indirect
 )

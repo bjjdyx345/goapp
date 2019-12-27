@@ -1,4 +1,4 @@
-package sys
+package card
 
 import (
 	"errors"
@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
 	"github.com/it234/goapp/internal/pkg/models/basemodel"
+	"github.com/it234/goapp/internal/pkg/models/card"
 	models "github.com/it234/goapp/internal/pkg/models/common"
-	"github.com/it234/goapp/internal/pkg/models/sys"
 	"net/http"
 )
 
@@ -25,8 +25,8 @@ type Address struct{
 
 func (VillageCon) Detail(c *gin.Context) {
 	id := common.GetQueryToUint64(c, "id")
-	var village sys.Village
-	where := sys.Village{}
+	var village card.Village
+	where := card.Village{}
 	where.ID = id
 	_, err := models.First(&where, &village)
 	if err != nil {
@@ -62,8 +62,8 @@ func (VillageCon) List(c *gin.Context) {
 		whereOrder = append(whereOrder, models.PageWhereOrder{Where: "name like ? or code like ?", Value: arr})
 	}
 	var total uint64
-	list:= []sys.Village{}
-	err := models.GetPage(&sys.Village{}, &sys.Village{}, &list, page, limit, &total, whereOrder...)
+	list:= []card.Village{}
+	err := models.GetPage(&card.Village{}, &card.Village{}, &list, page, limit, &total, whereOrder...)
 	if err != nil {
 		common.ResErrSrv(c, err)
 		return
@@ -79,7 +79,7 @@ func (VillageCon) DeleteById(c *gin.Context) {
 		common.ResErrSrv(c, err)
 		return
 	}
-	err=sys.DeleteOneVillageById(ids)
+	err= card.DeleteOneVillageById(ids)
 	if err != nil{
 		common.ResErrSrv(c, err)
 		return
@@ -90,8 +90,8 @@ func (VillageCon) DeleteById(c *gin.Context) {
 
 func (VillageCon) Getall(c *gin.Context) {
 	// 所有菜单
-	var villages []sys.Village
-	err := models.Find(&sys.Village{}, &villages, "id asc", "village_name asc")
+	var villages []card.Village
+	err := models.Find(&card.Village{}, &villages, "id asc", "village_name asc")
 	if err != nil {
 		common.ResErrSrv(c, err)
 		return
@@ -102,7 +102,7 @@ func (VillageCon) Getall(c *gin.Context) {
 
 // 更新
 func (VillageCon) Update(c *gin.Context) {
-	model := sys.Village{}
+	model := card.Village{}
 	err := c.Bind(&model)
 	if err != nil {
 		common.ResErrSrv(c, err)
@@ -118,7 +118,7 @@ func (VillageCon) Update(c *gin.Context) {
 
 //新增
 func (VillageCon) Create(c *gin.Context) {
-	card := sys.Village{}
+	card := card.Village{}
 	err := c.Bind(&card)
 	if err != nil {
 		common.ResErrSrv(c, err)
@@ -135,12 +135,12 @@ func (VillageCon) Create(c *gin.Context) {
 //新增
 func (VillageCon) GetAllAddress(c *gin.Context) {
 	// 所有菜单
-	var queryvil sys.Village
+	var queryvil card.Village
 	var address []Address
 	var addressapd Address
-	var villages []sys.Village
+	var villages []card.Village
 	var resCount int
-	villages,resCount =sys.QueryVillage(queryvil)
+	villages,resCount = card.QueryVillage(queryvil)
 	if resCount < 1 {
 		common.ResErrSrv(c, errors.New("has  not find the record"))
 		return
@@ -162,12 +162,12 @@ func (VillageCon) GetAllAddress(c *gin.Context) {
 
 /*----------------------分割线----------------*/
 func (VillageCon) Add_back(c *gin.Context){
-	var villagejson=sys.Village{}
+	var villagejson= card.Village{}
 	if err:=c.BindJSON(&villagejson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
-	_,res_count:=sys.QueryVillage(villagejson);
+	_,res_count:= card.QueryVillage(villagejson);
 	if(res_count>0){
 		c.JSON(200,gin.H{
 			"errno":-3,
@@ -178,9 +178,9 @@ func (VillageCon) Add_back(c *gin.Context){
 		return
 	}
 	//if has exist the city
-	if(sys.IsExistCity(villagejson.VillageAtDistrict)>0){
+	if(card.IsExistCity(villagejson.VillageAtDistrict)>0){
 		//entireaddress:=sys.GetCityInfo(villagejson.VillageAtDistrict)[0].MergerName
-		err:=sys.AddNewVillage(villagejson)
+		err:= card.AddNewVillage(villagejson)
 		if(err==nil){
 			c.JSON(200,gin.H{
 				"errno":0,
@@ -207,7 +207,7 @@ func (VillageCon) Add_back(c *gin.Context){
 }
 
 func (VillageCon) Query_back(c *gin.Context){
-	var villagejson=sys.Village{}
+	var villagejson= card.Village{}
 	if err:=c.BindJSON(&villagejson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
@@ -216,7 +216,7 @@ func (VillageCon) Query_back(c *gin.Context){
 	if(villagejson.VillageAtProvince!=""||villagejson.VillageAtDistrict!=""||villagejson.VillageAtCity!=""){
 		//entireaddress:=sys.GetCityInfo(villagejson.VillageAtDistrict)[0].MergerName
 
-		res,res_count:=sys.QueryVillage(villagejson)
+		res,res_count:= card.QueryVillage(villagejson)
 		if(res_count>0){
 			c.JSON(200,gin.H{
 				"errno":0,
@@ -246,7 +246,7 @@ func (VillageCon) Query_back(c *gin.Context){
 
 
 func (VillageCon) Delete_back(c *gin.Context){
-	var villagejson=sys.Village{}
+	var villagejson= card.Village{}
 	var res_count int
 	var err error
 	if err:=c.BindJSON(&villagejson);err!=nil{
@@ -254,9 +254,9 @@ func (VillageCon) Delete_back(c *gin.Context){
 		return
 	}
 	//if can query village address,we can return the json
-	if(sys.IsNotNull(villagejson)==nil){
+	if(card.IsNotNull(villagejson)==nil){
 		//entireaddress:=sys.GetCityInfo(villagejson.VillageAtDistrict)[0].MergerName
-		_,res_count=sys.QueryVillage(villagejson)
+		_,res_count= card.QueryVillage(villagejson)
 		if(res_count<1){
 			c.JSON(200,gin.H{
 				"errno":-3,
@@ -267,7 +267,7 @@ func (VillageCon) Delete_back(c *gin.Context){
 			})
 			return
 		}
-		res_count,err=sys.DeleteVillages(villagejson)
+		res_count,err= card.DeleteVillages(villagejson)
 		if(err==nil){
 			c.JSON(200,gin.H{
 				"errno":0,
@@ -305,16 +305,16 @@ error code
 */
 
 func (VillageCon)Update_back(c *gin.Context){
-	var villagejson=sys.Village{}
+	var villagejson= card.Village{}
 	if err:=c.BindJSON(&villagejson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
 	//villagejson.ID=sys.StringToUint64(c.Query("id"))
 	//all cow are not null
-	if(sys.IsAllNotNull(villagejson)==nil&&(villagejson.ID>0)){
+	if(card.IsAllNotNull(villagejson)==nil&&(villagejson.ID>0)){
 		var (
-			_,res_count= sys.QueryVillage(sys.Village{
+			_,res_count= card.QueryVillage(card.Village{
 				Model: basemodel.Model{
 					ID: villagejson.ID,
 				},
@@ -330,7 +330,7 @@ func (VillageCon)Update_back(c *gin.Context){
 				"trace_id":"",
 			})
 		}else if(res_count==1){
-			sys.UpdateVillage(villagejson)
+			card.UpdateVillage(villagejson)
 				c.JSON(200,gin.H{
 					"errno":0,
 					"errmsg":",successful update one records",

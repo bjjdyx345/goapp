@@ -1,9 +1,10 @@
-package sys
+package card
 import (
 	"errors"
 	"fmt"
 	"github.com/it234/goapp/internal/pkg/models/basemodel"
 	"github.com/it234/goapp/internal/pkg/models/db"
+	"github.com/it234/goapp/internal/pkg/models/sys"
 	"time"
 )
 //订单表结构
@@ -18,7 +19,7 @@ type Village struct {
 	VillageAtAddress	string	`gorm:"column:village_at_address;type:varchar(255);" json:"village_at_address" form:"village_at_address" binding:"-"`
 }
 func (Village) TableName() string {
-	return TableName("village")
+	return sys.TableName("village")
 }
 
 

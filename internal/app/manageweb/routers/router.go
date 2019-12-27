@@ -39,4 +39,6 @@ func RegisterRouter(app *gin.Engine) {
 	))
 	//sys
 	RegisterRouterSys(g)
+	RegisterRouterCard(g)
+	RegisterRouterWebssh(g)
 }

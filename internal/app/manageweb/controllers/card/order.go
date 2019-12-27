@@ -1,10 +1,10 @@
-package sys
+package card
 
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
-	"github.com/it234/goapp/internal/pkg/models/sys"
+	"github.com/it234/goapp/internal/pkg/models/card"
 	models "github.com/it234/goapp/internal/pkg/models/common"
 	"net/http"
 )
@@ -17,8 +17,8 @@ type OrderCon struct {}
 
 func (OrderCon) Detail(c *gin.Context) {
 	id := common.GetQueryToUint64(c, "id")
-	var order sys.Order
-	where := sys.Order{}
+	var order card.Order
+	where := card.Order{}
 	where.ID = id
 	_, err := models.First(&where, &order)
 	if err != nil {
@@ -55,8 +55,8 @@ func (OrderCon) List(c *gin.Context) {
 		whereOrder = append(whereOrder, models.PageWhereOrder{Where: "name like ? or code like ?", Value: arr})
 	}
 	var total uint64
-	list:= []sys.Order{}
-	err := models.GetPage(&sys.Order{}, &sys.Order{}, &list, page, limit, &total, whereOrder...)
+	list:= []card.Order{}
+	err := models.GetPage(&card.Order{}, &card.Order{}, &list, page, limit, &total, whereOrder...)
 	if err != nil {
 		common.ResErrSrv(c, err)
 		return
@@ -84,8 +84,8 @@ func (OrderCon) DeleteById(c *gin.Context) {
 
 func (OrderCon) Getall(c *gin.Context) {
 	// 所有菜单
-	var orders []sys.Order
-	err := models.Find(&sys.Order{}, &orders, "id asc", "order_status asc")
+	var orders []card.Order
+	err := models.Find(&card.Order{}, &orders, "id asc", "order_status asc")
 	if err != nil {
 		common.ResErrSrv(c, err)
 		return
@@ -96,7 +96,7 @@ func (OrderCon) Getall(c *gin.Context) {
 
 // 更新
 func (OrderCon) Update(c *gin.Context) {
-	model := sys.Order{}
+	model := card.Order{}
 	err := c.Bind(&model)
 	if err != nil {
 		common.ResErrSrv(c, err)
@@ -112,7 +112,7 @@ func (OrderCon) Update(c *gin.Context) {
 
 //新增
 func (OrderCon) Create(c *gin.Context) {
-	order := sys.Order{}
+	order := card.Order{}
 	err := c.Bind(&order)
 
 	if err != nil {
@@ -120,7 +120,7 @@ func (OrderCon) Create(c *gin.Context) {
 		common.ResErrSrv(c, err)
 		return
 	}
-	err=sys.IsPhoneNum(order.OrderPhoneNumber)
+	err= card.IsPhoneNum(order.OrderPhoneNumber)
 	if err != nil {
 		fmt.Println("phone number err,",err)
 		common.ResFail(c, "操作失败")
@@ -159,15 +159,15 @@ OrderStatus
 	4	配送完成
 */
 func (OrderCon) Add(c *gin.Context){
-	var orderjson=sys.Order{}
+	var orderjson= card.Order{}
 	//addressid 等参数并未做实际,下单时cardid并没有
-	if err:=c.BindJSON(&orderjson);err!=nil&&(sys.IsnotNullOrder(orderjson)!=nil){
+	if err:=c.BindJSON(&orderjson);err!=nil&&(card.IsnotNullOrder(orderjson)!=nil){
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
-	var queryvillage sys.Village
-	queryvillage.ID=sys.StringToUint64(orderjson.OrderAddress)
-	_,res_count:=sys.QueryVillage(queryvillage)
+	var queryvillage card.Village
+	queryvillage.ID= card.StringToUint64(orderjson.OrderAddress)
+	_,res_count:= card.QueryVillage(queryvillage)
 	if(res_count<1){
 		c.JSON(200,gin.H{
 			"errno":-1,
@@ -177,8 +177,8 @@ func (OrderCon) Add(c *gin.Context){
 		})
 	}else{
 		orderjson.OrderStatus="0"
-		if(sys.IsPhoneNum(orderjson.OrderPhoneNumber)==nil){
-			err:=sys.AddNewOrder(orderjson)
+		if(card.IsPhoneNum(orderjson.OrderPhoneNumber)==nil){
+			err:= card.AddNewOrder(orderjson)
 			if(err==nil){
 				c.JSON(200,gin.H{
 					"errno":0,
@@ -212,17 +212,17 @@ func (OrderCon) Add(c *gin.Context){
 	phonenumber
 */
 func (OrderCon) Delete_back(c *gin.Context){
-	var orderjson=sys.Order{}
+	var orderjson= card.Order{}
 	if err:=c.BindJSON(&orderjson);err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
 	if(orderjson.ID>0){
-		var queryorder=sys.Order{}
+		var queryorder= card.Order{}
 		queryorder.ID=orderjson.ID
-		_,res_count:=sys.QueryOrder(orderjson)
+		_,res_count:= card.QueryOrder(orderjson)
 		if(res_count>0){
-			err:=sys.DeleteOrders(orderjson)
+			err:= card.DeleteOrders(orderjson)
 			if(err==nil){
 				c.JSON(200,gin.H{
 					"errno":0,
@@ -267,14 +267,14 @@ Input
 
 */
 func (OrderCon) Query_back(c *gin.Context) {
-	var orderjson = sys.Order{}
+	var orderjson = card.Order{}
 	if err := c.BindJSON(&orderjson); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	//if ID /username/phonenum are not null
-	if(sys.IsPhoneNum(orderjson.OrderPhoneNumber)==nil&&orderjson.OrderUsername!=""){
-		ordermap,res_count:=sys.QueryOrder(orderjson)
+	if(card.IsPhoneNum(orderjson.OrderPhoneNumber)==nil&&orderjson.OrderUsername!=""){
+		ordermap,res_count:= card.QueryOrder(orderjson)
 		if(res_count>0){
 			c.JSON(200,gin.H{
 				"errno":0,
@@ -311,14 +311,14 @@ Input
 */
 
 func (OrderCon) Update_back(c *gin.Context) {
-	var orderjson = sys.Order{}
+	var orderjson = card.Order{}
 
-	if err := c.BindJSON(&orderjson); (err != nil && sys.IsnotNullOrder(orderjson) != nil) {
+	if err := c.BindJSON(&orderjson); (err != nil && card.IsnotNullOrder(orderjson) != nil) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if(orderjson.ID>0){
-		if err:=sys.UpdateOrder(orderjson);err==nil{
+		if err:= card.UpdateOrder(orderjson);err==nil{
 			c.JSON(200,gin.H{
 				"errno":0,
 				"errmsg":"Update successfully",

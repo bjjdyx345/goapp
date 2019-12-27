@@ -1,19 +1,19 @@
 package manageweb
 
 import (
-	"github.com/it234/goapp/internal/app/manageweb/controllers/sys"
+	"github.com/it234/goapp/internal/app/manageweb/controllers/card"
 	"net/http"
 	"time"
 
 	webconfig "github.com/it234/goapp/internal/app/manageweb/config"
-	"github.com/it234/goapp/internal/pkg/config"
+	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
 	"github.com/it234/goapp/internal/app/manageweb/middleware"
 	"github.com/it234/goapp/internal/app/manageweb/routers"
+	"github.com/it234/goapp/internal/pkg/config"
 	"github.com/it234/goapp/internal/pkg/models"
-	"github.com/it234/goapp/pkg/logger"
-	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
 	"github.com/it234/goapp/pkg/convert"
-	
+	"github.com/it234/goapp/pkg/logger"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -48,8 +48,8 @@ func initWeb(config *config.Config){
 	app.NoRoute(middleware.NoRouteHandler())
 	// 崩溃恢复
 	app.Use(middleware.RecoveryMiddleware())
-	app.Use(sys.HelloMiddleware())
-	app.Use(sys.Response())
+	app.Use(card.HelloMiddleware())
+	app.Use(card.Response())
 
 
 	app.LoadHTMLGlob(config.Web.StaticPath+"dist/*.html")
@@ -58,6 +58,7 @@ func initWeb(config *config.Config){
 	app.StaticFile("/favicon.ico", config.Web.StaticPath+"dist/favicon.ico")
 	// 注册路由
 	routers.RegisterRouter(app)
+
   go initHTTPServer(config,app)
 }
 

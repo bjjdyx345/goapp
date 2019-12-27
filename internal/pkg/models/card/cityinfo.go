@@ -1,8 +1,9 @@
-package sys
+package card
 
 import (
 	"fmt"
 	"github.com/it234/goapp/internal/pkg/models/db"
+	"github.com/it234/goapp/internal/pkg/models/sys"
 )
 
 type CityInfo struct {
@@ -21,7 +22,7 @@ type CityInfo struct {
 }
 
 func (CityInfo) TableName() string {
-	return TableName("cityinfo")
+	return sys.TableName("cityinfo")
 }
 
 //添加订单信息

@@ -3,7 +3,6 @@ package sys
 import (
 	"encoding/json"
 	"time"
-
 	"github.com/it234/goapp/internal/app/manageweb/controllers/common"
 	models "github.com/it234/goapp/internal/pkg/models/common"
 	"github.com/it234/goapp/internal/pkg/models/sys"
@@ -428,6 +427,7 @@ func (User) EditPwd(c *gin.Context) {
 	modelOld := sys.Admins{}
 	_, err = models.First(&where, &modelOld)
 	if err != nil {
+
 		common.ResErrSrv(c, err)
 		return
 	}
@@ -438,6 +438,7 @@ func (User) EditPwd(c *gin.Context) {
 	modelNew:=sys.Admins{Password:new_password}
 	err = models.Updates(&modelOld, &modelNew)
 	if err != nil {
+
 		common.ResFail(c, "操作失败")
 		return
 	}

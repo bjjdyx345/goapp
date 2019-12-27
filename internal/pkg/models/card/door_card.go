@@ -1,10 +1,11 @@
-package sys
+package card
 
 import (
 	"fmt"
-	"github.com/it234/goapp/internal/pkg/models/db"
-	"github.com/jinzhu/gorm"
 	"github.com/it234/goapp/internal/pkg/models/basemodel"
+	"github.com/it234/goapp/internal/pkg/models/db"
+	"github.com/it234/goapp/internal/pkg/models/sys"
+	"github.com/jinzhu/gorm"
 	"regexp"
 	"strconv"
 	"strings"
@@ -20,7 +21,7 @@ type Door_card struct {
 }
 
 func (Door_card) TableName() string {
-	return TableName("doorcard")
+	return sys.TableName("doorcard")
 }
 
 // 添加前

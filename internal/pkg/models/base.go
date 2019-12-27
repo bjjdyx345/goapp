@@ -2,13 +2,14 @@ package models
 
 import (
 	"fmt"
+	"github.com/it234/goapp/internal/pkg/models/card"
 	"log"
 	"os"
 	"time"
 
 	"github.com/it234/goapp/internal/pkg/config"
-	"github.com/it234/goapp/internal/pkg/models/sys"
 	"github.com/it234/goapp/internal/pkg/models/db"
+	"github.com/it234/goapp/internal/pkg/models/sys"
 
 	"github.com/jinzhu/gorm"
 )
@@ -43,8 +44,8 @@ func Migration() {
 	fmt.Println(db.DB.AutoMigrate(new(sys.RoleMenu)).Error)
 	fmt.Println(db.DB.AutoMigrate(new(sys.Role)).Error)
 	fmt.Println(db.DB.AutoMigrate(new(sys.AdminsRole)).Error)
-	fmt.Println(db.DB.AutoMigrate(new(sys.Door_card)).Error)
-	fmt.Println(db.DB.AutoMigrate(new(sys.Village)).Error)
-	fmt.Println(db.DB.AutoMigrate(new(sys.Order)).Error)
+	fmt.Println(db.DB.AutoMigrate(new(card.Door_card)).Error)
+	fmt.Println(db.DB.AutoMigrate(new(card.Village)).Error)
+	fmt.Println(db.DB.AutoMigrate(new(card.Order)).Error)
 
 }
