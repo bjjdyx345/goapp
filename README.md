@@ -34,6 +34,7 @@ go get -v github.com/it234/goapp
 
 1. 默认配置采用的是 sqlite 数据库，数据库文件(`自动生成`)在`cmd/manageweb/data/goapp.db`。如果想切换为`mysql`或`postgres`，请更改配置文件，并创建数据库（表会自动创建）。
 2. 日志的配置为标准输出并写入文件。
+3. 关于Goland使用此项目，针对1.12以上的版本，如使用gomod，请删除或者关闭govendor特性。否则会出现IDE无法跳转到指定函数情况
 
 ## 前端实现
 
